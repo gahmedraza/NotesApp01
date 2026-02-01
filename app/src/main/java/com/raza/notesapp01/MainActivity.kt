@@ -47,11 +47,11 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun Dashboard() {
-    //val db = TodoDatabase.getDatabase(LocalContext.current)
-    //val repository = TodoRepository(db.todoDao())
-    //val factory = DashboardViewModelFactory(repository)
+    val db = TodoDatabase.getDatabase(LocalContext.current)
+    val repository = TodoRepository(db.todoDao())
+    val factory = DashboardViewModelFactory(repository)
 
-    val viewModel: DashboardViewModel = viewModel()
+    val viewModel: DashboardViewModel = viewModel(factory = factory)
 
     val todo by viewModel.todos.collectAsState(initial = emptyList())
 

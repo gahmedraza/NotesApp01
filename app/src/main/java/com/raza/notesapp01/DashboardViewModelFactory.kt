@@ -3,7 +3,6 @@ package com.raza.notesapp01
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 
-/*
 class DashboardViewModelFactory(
     private val repository: TodoRepository
 ) : ViewModelProvider.Factory {
@@ -15,4 +14,4 @@ class DashboardViewModelFactory(
 
         throw IllegalArgumentException("Unknown ViewModel class")
     }
-}*/
+}
