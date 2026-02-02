@@ -7,5 +7,6 @@ import androidx.room.PrimaryKey
 data class TodoEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    var value: String
+    var value: String = "",
+    var lastModified: Long = System.currentTimeMillis()
 )

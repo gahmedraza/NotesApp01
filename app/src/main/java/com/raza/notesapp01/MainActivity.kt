@@ -31,6 +31,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.firebase.firestore.FirebaseFirestore
 import com.raza.notesapp01.ui.theme.NotesApp01Theme
 
 class MainActivity : ComponentActivity() {
@@ -48,7 +49,8 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun Dashboard() {
     val db = TodoDatabase.getDatabase(LocalContext.current)
-    val repository = TodoRepository(db.todoDao())
+    val firestore = FirebaseFirestore.getInstance()
+    val repository = TodoRepository(db.todoDao(), firestore, LocalContext.current)
     val factory = DashboardViewModelFactory(repository)
 
     val viewModel: DashboardViewModel = viewModel(factory = factory)

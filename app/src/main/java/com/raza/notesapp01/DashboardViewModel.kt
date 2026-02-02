@@ -16,11 +16,17 @@ class DashboardViewModel(
 
     val todos = repository.todos
 
-        /*mutableStateListOf(
-            TodoEntity(1, "Buy milk"),
-            TodoEntity(2, "Learn compose"),
-            TodoEntity(3, "Walk in the morning")
-        )*/
+    /*mutableStateListOf(
+        TodoEntity(1, "Buy milk"),
+        TodoEntity(2, "Learn compose"),
+        TodoEntity(3, "Walk in the morning")
+    )*/
+
+    init {
+        viewModelScope.launch {
+            repository.syncFromDatabase()
+        }
+    }
 
     var editedTodo by mutableStateOf<TodoEntity?>(null)
 
