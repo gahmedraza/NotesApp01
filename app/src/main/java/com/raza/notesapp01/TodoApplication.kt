@@ -15,10 +15,10 @@ class TodoApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        /*val request = OneTimeWorkRequestBuilder<TodoSyncWorker>()
+        val request = OneTimeWorkRequestBuilder<TodoSyncWorker>()
                 .build()
         WorkManager.getInstance(this)
-            .enqueue(request)*/
+            .enqueue(request)
 
         schedulePeriodicTodoSync(this)
     }
