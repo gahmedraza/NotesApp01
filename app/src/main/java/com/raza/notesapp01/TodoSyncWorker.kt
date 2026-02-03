@@ -21,6 +21,7 @@ class TodoSyncWorker(
             val repository = TodoRepository(dao, firestore, context)
 
             repository.syncFromFirebase()
+            repository.cleanupDeletedTodos(7)
 
             Log.d("TAG", "worker success")
             Result.success()

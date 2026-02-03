@@ -28,8 +28,13 @@ class TodoRepository(
     }
 
     suspend fun delete(todo: TodoEntity) {
-        dao.deleteTodo(todo)
-        uploadAllToFirebase()
+        todo.isDeleted = true
+        todo.lastModified =
+            System.currentTimeMillis()
+
+        dao.updateTodo(todo)
+        enqueueSyncWorker()
+        //uploadAllToFirebase()
     }
 
     suspend fun update(todo: TodoEntity) {
@@ -107,5 +112,11 @@ class TodoRepository(
                 ExistingWorkPolicy.KEEP,
                 request
             )
+    }
+
+    suspend fun cleanupDeletedTodos(days: Int = 7) {
+        val thresholdTime = System.currentTimeMillis() -
+                (days * 24 * 60 * 60 * 1000L)
+        dao.hardDeleteTodos(thresholdTime)
     }
 }

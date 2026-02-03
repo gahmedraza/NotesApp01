@@ -11,7 +11,10 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface TodoDao {
 
-    @Query("SELECT * FROM todos")
+    @Query(
+        "SELECT * FROM todos " +
+                "WHERE isDeleted = 0"
+    )
     fun getAllTodos(): Flow<List<TodoEntity>>
 
     @Insert
@@ -22,6 +25,12 @@ interface TodoDao {
 
     @Delete
     suspend fun deleteTodo(todo: TodoEntity)
+
+    @Query(
+        "DELETE FROM todos " +
+                "WHERE isDeleted=1 AND lastModified < :thresholdTime"
+    )
+    suspend fun hardDeleteTodos(thresholdTime: Long)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(todos: List<TodoEntity>)
