@@ -65,6 +65,19 @@ dependencies {
     implementation(libs.hilt.navigation.compose)
     implementation("androidx.hilt:hilt-work:1.2.0")
     ksp("androidx.hilt:hilt-compiler:1.2.0")
+    //copy paste starts
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    testImplementation("junit:junit:4.13.2")
+    //Below dependency was added to bring in
+    //the context using ApplicationProvider
+    //It is only available in the
+    // androidtest/ folder
+    //But was commented since we are running
+    //only the junit test cases and not the
+    //instrumentation
+    //testImplementation("androidx.test:core:1.5.0")
+    testImplementation("org.mockito:mockito-core:5.21.0")
+    //copy paste ends
     //Manual End
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

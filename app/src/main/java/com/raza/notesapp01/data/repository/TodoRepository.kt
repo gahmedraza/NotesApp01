@@ -7,10 +7,12 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import com.raza.notesapp01.Logger
 import com.raza.notesapp01.TodoSyncWorker
 import com.raza.notesapp01.data.local.TodoDao
 import com.raza.notesapp01.data.local.entity.TodoEntity
 import com.raza.notesapp01.data.remote.FirestoreTodoDataSource
+import com.raza.notesapp01.data.remote.TodoRemoteDataSource
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -18,8 +20,9 @@ import javax.inject.Inject
 
 class TodoRepository @Inject constructor(
     private val dao: TodoDao,
-    private val remote: FirestoreTodoDataSource,
-    @ApplicationContext private val context: Context
+    private val remote: TodoRemoteDataSource,
+    @ApplicationContext private val context: Context,
+    private val logger: Logger
 ) {
 
     val todos: Flow<List<TodoEntity>> = dao.getAllTodos()
@@ -90,7 +93,7 @@ class TodoRepository @Inject constructor(
             }
 
         // replace local db with merged result
-        Log.d("TAG", "todos = ${merged.size}")
+        logger.d("TAG", "todos = ${merged.size}")
         dao.clearAll()
         dao.insertAll(merged)
     }

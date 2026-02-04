@@ -20,6 +20,7 @@ class TodoSyncWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result {
         return try {
+            repository.uploadAllToFirebase()
             repository.syncFromFirebase()
             repository.cleanupDeletedTodos(7)
 
