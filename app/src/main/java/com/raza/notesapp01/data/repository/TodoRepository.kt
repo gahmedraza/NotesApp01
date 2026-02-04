@@ -1,4 +1,4 @@
-package com.raza.notesapp01
+package com.raza.notesapp01.data.repository
 
 import android.content.Context
 import android.util.Log
@@ -7,16 +7,19 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
-import com.google.firebase.firestore.FirebaseFirestore
+import com.raza.notesapp01.TodoSyncWorker
+import com.raza.notesapp01.data.local.TodoDao
+import com.raza.notesapp01.data.local.entity.TodoEntity
+import com.raza.notesapp01.data.remote.FirestoreTodoDataSource
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.forEach
-import kotlinx.coroutines.tasks.await
+import javax.inject.Inject
 
-class TodoRepository(
+class TodoRepository @Inject constructor(
     private val dao: TodoDao,
-    private val firestore: FirebaseFirestore,
-    private val context: Context
+    private val remote: FirestoreTodoDataSource,
+    @ApplicationContext private val context: Context
 ) {
 
     val todos: Flow<List<TodoEntity>> = dao.getAllTodos()
@@ -46,23 +49,17 @@ class TodoRepository(
     suspend fun uploadAllToFirebase() {
         val list = dao.getAllTodos().first()
 
-        val collection = firestore.collection("todos")
-
-        list.forEach { todo ->
-            collection.document(todo.id.toString())
-                .set(todo)
-        }
+        remote.uploadTodos(list)
     }
 
     suspend fun syncFromFirebase() {
-        val snapshot = firestore.collection("todos")
-            .get().await()
-        val remoteTodos = snapshot.toObjects(TodoEntity::class.java)
-
+        // Fetch remote and local
+        val remoteTodos = remote.fetchTodos()
         val localTodos = dao.getAllTodos().first()
 
         val merged = mutableListOf<TodoEntity>()
 
+        // merge remote with local
         remoteTodos.forEach { remote ->
             val local = localTodos.find { it.id == remote.id }
 
@@ -81,17 +78,25 @@ class TodoRepository(
             }
         }
 
-        Log.d("TAG", "todos = ${merged.size}")
+        // add local only todos
+        localTodos
+            .filter { local ->
+                remoteTodos.none { remote ->
+                    remote.id == local.id
+                }
+            }
+            .forEach { localOnly ->
+                merged.add(localOnly)
+            }
 
+        // replace local db with merged result
+        Log.d("TAG", "todos = ${merged.size}")
         dao.clearAll()
         dao.insertAll(merged)
     }
 
-    suspend fun syncFromDatabase() {
-        val snapshot = firestore.collection("todos")
-            .get().await()
-
-        val remoteTodos = snapshot.toObjects(TodoEntity::class.java)
+    suspend fun syncLocalFromRemote() {
+        val remoteTodos = remote.fetchTodos()
 
         dao.clearAll()
         dao.insertAll(remoteTodos)

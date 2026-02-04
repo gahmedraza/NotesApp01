@@ -1,4 +1,4 @@
-package com.raza.notesapp01
+package com.raza.notesapp01.data.local
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import com.raza.notesapp01.data.local.entity.TodoEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -32,7 +33,7 @@ interface TodoDao {
     )
     suspend fun hardDeleteTodos(thresholdTime: Long)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
     suspend fun insertAll(todos: List<TodoEntity>)
 
     @Query("DELETE FROM todos")

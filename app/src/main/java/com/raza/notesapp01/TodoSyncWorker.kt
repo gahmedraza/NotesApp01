@@ -2,24 +2,24 @@ package com.raza.notesapp01
 
 import android.content.Context
 import android.util.Log
+import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.google.firebase.firestore.FirebaseFirestore
+import com.raza.notesapp01.data.repository.TodoRepository
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
+import javax.inject.Inject
 
-class TodoSyncWorker(
-    private val context: Context,
-    workerParams: WorkerParameters,
+@HiltWorker
+class TodoSyncWorker @AssistedInject constructor(
+    @Assisted private val context: Context,
+    @Assisted workerParams: WorkerParameters,
+    private val repository: TodoRepository
 ) : CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): Result {
         return try {
-            val db = TodoDatabase.getDatabase(context)
-            val dao = db.todoDao()
-
-            val firestore = FirebaseFirestore.getInstance()
-
-            val repository = TodoRepository(dao, firestore, context)
-
             repository.syncFromFirebase()
             repository.cleanupDeletedTodos(7)
 

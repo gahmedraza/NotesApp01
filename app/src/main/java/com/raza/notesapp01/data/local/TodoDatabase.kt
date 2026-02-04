@@ -1,9 +1,10 @@
-package com.raza.notesapp01
+package com.raza.notesapp01.data.local
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.raza.notesapp01.data.local.entity.TodoEntity
 
 @Database(
     entities = [TodoEntity::class],

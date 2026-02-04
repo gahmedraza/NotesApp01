@@ -1,4 +1,4 @@
-package com.raza.notesapp01
+package com.raza.notesapp01.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
